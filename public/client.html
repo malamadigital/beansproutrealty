@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bean Sprout Realty — Client Files</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ash: #F4F4F2; --ash-mid: #E8E8E4; --ash-dark: #D4D4CE;
+    --navy: #1B2C3A; --steel: #4A7FA5;
+    --white: #FFFFFF; --text: #2A2A28; --text-mid: #5A5A56; --text-light: #8A8A84;
+    --font-display: 'Cormorant Garamond', serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-body); background: var(--ash); color: var(--text); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 56px 6% 80px; }
+  .header { margin-bottom: 8px; padding-bottom: 28px; border-bottom: 1px solid var(--ash-dark); }
+  .brand-label { font-size: 0.68rem; font-weight: 500; letter-spacing: 0.28em; text-transform: uppercase; color: var(--steel); margin-bottom: 10px; display: block; }
+  .brand-title { font-family: var(--font-display); font-size: clamp(1.8rem, 3.5vw, 2.6rem); font-weight: 400; color: var(--navy); line-height: 1.1; }
+  .meta-bar { margin: 28px 0 32px; }
+  .meta-text { font-size: 0.86rem; color: var(--text-light); font-weight: 300; }
+  .file-list { display: flex; flex-direction: column; gap: 2px; background: var(--ash-mid); border: 1px solid var(--ash-mid); border-radius: 2px; }
+  .file-row { display: flex; align-items: center; gap: 18px; padding: 18px 22px; background: var(--white); transition: background .2s; }
+  .file-row:hover { background: var(--ash); }
+  .file-icon {
+    width: 38px; height: 38px; flex-shrink: 0; border-radius: 3px; background: var(--ash);
+    display: flex; align-items: center; justify-content: center; color: var(--steel);
+    font-family: var(--font-display); font-size: 0.68rem; font-weight: 600;
+    letter-spacing: 0.02em; text-transform: uppercase; border: 1px solid var(--ash-dark);
+  }
+  .file-info { flex: 1; min-width: 0; }
+  .file-name { font-size: 0.92rem; font-weight: 500; color: var(--navy); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .file-sub { font-size: 0.74rem; color: var(--text-light); font-weight: 300; margin-top: 3px; }
+  .file-actions { flex-shrink: 0; }
+  .btn-icon {
+    font-family: var(--font-body); font-size: 0.7rem; font-weight: 500; letter-spacing: 0.06em;
+    text-transform: uppercase; padding: 9px 16px; border-radius: 2px; border: 1px solid var(--navy);
+    color: var(--navy); background: transparent; text-decoration: none; transition: background .2s, color .2s; display: inline-block;
+  }
+  .btn-icon:hover { background: var(--navy); color: var(--white); }
+  .empty-state { text-align: center; padding: 70px 20px; background: var(--white); border: 1px solid var(--ash-mid); border-radius: 2px; }
+  .empty-icon {
+    width: 42px; height: 42px; margin: 0 auto 18px; border: 1.5px solid var(--ash-dark);
+    border-radius: 4px; display: flex; align-items: center; justify-content: center; color: var(--ash-dark);
+  }
+  .empty-title { font-family: var(--font-display); font-size: 1.3rem; color: var(--navy); margin-bottom: 8px; }
+  .empty-sub { font-size: 0.85rem; color: var(--text-light); font-weight: 300; }
+  .loading-row, .error-row { text-align: center; padding: 50px 20px; color: var(--text-light); font-size: 0.86rem; font-weight: 300; }
+  .error-row { color: #A5544A; }
+  @media (max-width: 600px) {
+    .wrap { padding: 40px 6% 60px; }
+    .file-row { flex-wrap: wrap; }
+    .file-actions { width: 100%; margin-top: 4px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="header">
+    <span class="brand-label">Bean Sprout Realty Inc.</span>
+    <h1 class="brand-title">Client Files</h1>
+  </div>
+
+  <div class="meta-bar">
+    <span class="meta-text">Documents shared by your property team.</span>
+  </div>
+
+  <div id="file-list-wrap">
+    <div class="loading-row">Loading files…</div>
+  </div>
+</div>
+
+<script>
+  const LIST_URL = '/.netlify/functions/files-list';
+  const DOWNLOAD_URL = '/.netlify/functions/files-download';
+
+  const fileListWrap = document.getElementById('file-list-wrap');
+
+  function formatBytes(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+
+  function formatDate(iso) {
+    const d = new Date(iso);
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  function extTag(name) {
+    const ext = name.split('.').pop().toUpperCase().slice(0, 4);
+    return ext || 'FILE';
+  }
+
+  async function loadFiles() {
+    try {
+      const res = await fetch(LIST_URL);
+      if (!res.ok) throw new Error('Request failed');
+      const files = await res.json();
+      render(files);
+    } catch (e) {
+      fileListWrap.innerHTML = `<div class="error-row">Couldn't load files right now. Please check back shortly.</div>`;
+    }
+  }
+
+  function render(files) {
+    if (!files || files.length === 0) {
+      fileListWrap.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div class="empty-title">No files yet</div>
+          <div class="empty-sub">Your property team hasn't shared any documents yet.</div>
+        </div>`;
+      return;
+    }
+
+    const rows = files.map(f => `
+      <div class="file-row">
+        <div class="file-icon">${extTag(f.name)}</div>
+        <div class="file-info">
+          <div class="file-name">${f.name}</div>
+          <div class="file-sub">${formatBytes(f.size)} · Added ${formatDate(f.date)}</div>
+        </div>
+        <div class="file-actions">
+          <a class="btn-icon" href="${DOWNLOAD_URL}?id=${f.id}" download="${f.name}">Download</a>
+        </div>
+      </div>
+    `).join('');
+
+    fileListWrap.innerHTML = `<div class="file-list">${rows}</div>`;
+  }
+
+  loadFiles();
+</script>
+</body>
+</html>
