@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bean Sprout Realty — Client Login</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ash: #F4F4F2; --ash-mid: #E8E8E4; --ash-dark: #D4D4CE;
+    --navy: #1B2C3A; --navy-deep: #0F1C27; --steel: #4A7FA5; --steel-faint: #C8D8E4;
+    --white: #FFFFFF; --text: #2A2A28; --text-mid: #5A5A56; --text-light: #8A8A84;
+    --danger: #A5544A;
+    --font-display: 'Cormorant Garamond', serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-body);
+    background: var(--navy-deep);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .login-card {
+    background: var(--white);
+    border-radius: 4px;
+    padding: 48px 40px;
+    max-width: 380px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .brand-label {
+    font-size: 0.66rem; font-weight: 500; letter-spacing: 0.26em;
+    text-transform: uppercase; color: var(--steel); margin-bottom: 10px; display: block; text-align: center;
+  }
+  .login-title {
+    font-family: var(--font-display); font-size: 1.8rem; font-weight: 400;
+    color: var(--navy); text-align: center; margin-bottom: 32px; line-height: 1.2;
+  }
+  .field-label {
+    font-size: 0.72rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--text-mid); display: block; margin-bottom: 8px;
+  }
+  input[type="text"], input[type="password"] {
+    width: 100%; padding: 13px 14px; border: 1px solid var(--ash-dark); border-radius: 3px;
+    font-family: var(--font-body); font-size: 0.92rem; color: var(--text);
+    background: var(--ash); margin-bottom: 22px; transition: border-color .2s;
+  }
+  input[type="text"]:focus, input[type="password"]:focus { outline: none; border-color: var(--steel); }
+  .btn-submit {
+    width: 100%; background: var(--navy); color: var(--white); border: none;
+    padding: 14px; border-radius: 3px; font-family: var(--font-body); font-size: 0.8rem;
+    font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer;
+    transition: background .2s;
+  }
+  .btn-submit:hover { background: var(--steel); }
+  .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+  .error-msg {
+    font-size: 0.82rem; color: var(--danger); margin-top: 16px; text-align: center;
+    display: none;
+  }
+  .error-msg.show { display: block; }
+</style>
+</head>
+<body>
+
+<div class="login-card">
+  <span class="brand-label">Bean Sprout Realty Inc.</span>
+  <h1 class="login-title">Client Access</h1>
+  <form id="login-form">
+    <label class="field-label" for="username">Username</label>
+    <input type="text" id="username" name="username" autocomplete="username" required>
+    <label class="field-label" for="password">Password</label>
+    <input type="password" id="password" name="password" autocomplete="current-password" required>
+    <button type="submit" class="btn-submit" id="submit-btn">Sign In</button>
+    <div class="error-msg" id="error-msg"></div>
+  </form>
+</div>
+
+<script>
+  const form = document.getElementById('login-form');
+  const usernameInput = document.getElementById('username');
+  const passwordInput = document.getElementById('password');
+  const submitBtn = document.getElementById('submit-btn');
+  const errorMsg = document.getElementById('error-msg');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorMsg.className = 'error-msg';
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Signing in…';
+
+    try {
+      const res = await fetch('/.netlify/functions/auth-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role: 'client', username: usernameInput.value, password: passwordInput.value })
+      });
+      const data = await res.json();
+
+      if (res.ok && data.ok) {
+        window.location.href = '/';
+      } else {
+        errorMsg.textContent = data.error || 'Incorrect username or password';
+        errorMsg.className = 'error-msg show';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Sign In';
+        passwordInput.value = '';
+        passwordInput.focus();
+      }
+    } catch (e) {
+      errorMsg.textContent = 'Something went wrong. Please try again.';
+      errorMsg.className = 'error-msg show';
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Sign In';
+    }
+  });
+</script>
+</body>
+</html>

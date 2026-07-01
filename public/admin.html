@@ -50,20 +50,121 @@
     color: var(--steel); background: var(--steel-faint); padding: 6px 14px;
     border-radius: 20px; flex-shrink: 0;
   }
-  .meta-bar { margin: 28px 0 32px; }
+  .meta-bar { margin: 28px 0 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
   .meta-text { font-size: 0.86rem; color: var(--text-light); font-weight: 300; }
+
+  /* Section headers used for Clients + Upload blocks */
+  .section-block { margin-bottom: 36px; }
+  .section-heading {
+    font-family: var(--font-display); font-size: 1.15rem; font-weight: 500;
+    color: var(--navy); margin-bottom: 14px; display: flex; align-items: center; gap: 10px;
+  }
+  .section-heading .count-badge {
+    font-family: var(--font-body); font-size: 0.68rem; font-weight: 500;
+    color: var(--text-light); background: var(--ash-mid); padding: 3px 9px; border-radius: 10px;
+  }
+
+  /* CLIENT MANAGEMENT PANEL */
+  .clients-panel {
+    background: var(--white); border: 1px solid var(--ash-mid); border-radius: 3px;
+    padding: 22px; margin-bottom: 36px;
+  }
+  .clients-panel-toggle {
+    display: flex; justify-content: space-between; align-items: center; cursor: pointer;
+  }
+  .clients-panel-toggle .section-heading { margin-bottom: 0; }
+  .toggle-caret {
+    font-size: 0.8rem; color: var(--text-light); transition: transform .25s;
+  }
+  .clients-panel.open .toggle-caret { transform: rotate(180deg); }
+  .clients-panel-body {
+    max-height: 0; overflow: hidden; transition: max-height .3s ease;
+  }
+  .clients-panel.open .clients-panel-body { max-height: 900px; margin-top: 18px; }
+
+  .add-client-form {
+    display: grid; grid-template-columns: 1.2fr 1fr 1fr auto; gap: 10px; margin-bottom: 20px;
+  }
+  .add-client-form input {
+    padding: 10px 12px; border: 1px solid var(--ash-dark); border-radius: 3px;
+    font-family: var(--font-body); font-size: 0.84rem; background: var(--ash);
+  }
+  .add-client-form input:focus { outline: none; border-color: var(--steel); }
+  .btn-add-client {
+    background: var(--navy); color: var(--white); border: none; padding: 10px 18px;
+    border-radius: 3px; font-family: var(--font-body); font-size: 0.72rem; font-weight: 500;
+    letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: background .2s;
+    white-space: nowrap;
+  }
+  .btn-add-client:hover { background: var(--steel); }
+  .btn-add-client:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .clients-table { display: flex; flex-direction: column; gap: 1px; background: var(--ash-mid); border-radius: 2px; overflow: hidden; }
+  .client-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 12px 14px; background: var(--white); font-size: 0.84rem;
+  }
+  .client-row .name { font-weight: 500; color: var(--navy); }
+  .client-row .username { color: var(--text-light); font-size: 0.78rem; margin-left: 8px; }
+  .client-row .remove-btn {
+    font-size: 0.66rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--danger);
+    background: none; border: none; cursor: pointer; padding: 4px 8px;
+  }
+  .client-row .remove-btn:hover { text-decoration: underline; }
+  .clients-empty { padding: 16px; text-align: center; color: var(--text-light); font-size: 0.82rem; background: var(--white); }
+  .form-error { font-size: 0.78rem; color: var(--danger); margin-top: -8px; margin-bottom: 14px; display: none; }
+  .form-error.show { display: block; }
+
+  /* CLIENT PICKER (for upload) */
+  .client-picker { margin-bottom: 18px; position: relative; }
+  .picker-label {
+    font-size: 0.72rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--text-mid); display: block; margin-bottom: 8px;
+  }
+  .picker-search-wrap { position: relative; }
+  .picker-search {
+    width: 100%; padding: 12px 14px; border: 1px solid var(--ash-dark); border-radius: 3px;
+    font-family: var(--font-body); font-size: 0.88rem; background: var(--white);
+  }
+  .picker-search:focus { outline: none; border-color: var(--steel); }
+  .picker-dropdown {
+    position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: var(--white);
+    border: 1px solid var(--ash-dark); border-radius: 3px; max-height: 220px; overflow-y: auto;
+    z-index: 10; box-shadow: 0 8px 24px rgba(0,0,0,0.08); display: none;
+  }
+  .picker-dropdown.show { display: block; }
+  .picker-option {
+    padding: 11px 14px; cursor: pointer; font-size: 0.86rem; transition: background .15s;
+  }
+  .picker-option:hover, .picker-option.highlighted { background: var(--ash); }
+  .picker-option .opt-name { color: var(--navy); font-weight: 500; }
+  .picker-option .opt-username { color: var(--text-light); font-size: 0.76rem; margin-left: 6px; }
+  .picker-empty { padding: 14px; font-size: 0.82rem; color: var(--text-light); text-align: center; }
+  .selected-client-chip {
+    display: inline-flex; align-items: center; gap: 8px; background: var(--steel-faint);
+    color: var(--navy); padding: 8px 14px; border-radius: 20px; font-size: 0.82rem; font-weight: 500;
+    margin-top: 10px;
+  }
+  .selected-client-chip button {
+    background: none; border: none; color: var(--navy); cursor: pointer; font-size: 0.9rem;
+    line-height: 1; padding: 0; opacity: 0.6;
+  }
+  .selected-client-chip button:hover { opacity: 1; }
+
   .drop-zone {
     border: 1.5px dashed var(--ash-dark); border-radius: 4px; background: var(--white);
     padding: 40px 28px; text-align: center; margin-bottom: 36px;
-    transition: border-color .2s, background .2s; cursor: pointer;
+    transition: border-color .2s, background .2s, opacity .2s; cursor: pointer;
   }
   .drop-zone:hover, .drop-zone.drag-over { border-color: var(--steel); background: var(--steel-faint); }
+  .drop-zone.disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
   .drop-icon {
     width: 42px; height: 42px; margin: 0 auto 16px; border: 1.5px solid var(--steel);
     border-radius: 4px; display: flex; align-items: center; justify-content: center; color: var(--steel);
   }
   .drop-title { font-family: var(--font-display); font-size: 1.2rem; font-weight: 400; color: var(--navy); margin-bottom: 6px; }
   .drop-sub { font-size: 0.82rem; color: var(--text-light); font-weight: 300; }
+
   .file-list { display: flex; flex-direction: column; gap: 2px; background: var(--ash-mid); border: 1px solid var(--ash-mid); border-radius: 2px; }
   .file-row { display: flex; align-items: center; gap: 18px; padding: 18px 22px; background: var(--white); transition: background .2s; }
   .file-row:hover { background: var(--ash); }
@@ -75,7 +176,11 @@
   }
   .file-info { flex: 1; min-width: 0; }
   .file-name { font-size: 0.92rem; font-weight: 500; color: var(--navy); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .file-sub { font-size: 0.74rem; color: var(--text-light); font-weight: 300; margin-top: 3px; }
+  .file-sub { font-size: 0.74rem; color: var(--text-light); font-weight: 300; margin-top: 3px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .client-badge {
+    font-size: 0.66rem; font-weight: 500; letter-spacing: 0.02em; color: var(--steel);
+    background: var(--steel-faint); padding: 2px 9px; border-radius: 10px;
+  }
   .file-actions { display: flex; gap: 8px; flex-shrink: 0; }
   .btn-icon {
     font-family: var(--font-body); font-size: 0.7rem; font-weight: 500; letter-spacing: 0.06em;
@@ -104,6 +209,9 @@
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .toast.error { background: var(--danger); }
+  @media (max-width: 700px) {
+    .add-client-form { grid-template-columns: 1fr; }
+  }
   @media (max-width: 600px) {
     .wrap { padding: 40px 6% 60px; }
     .header { align-items: flex-start; }
@@ -120,19 +228,54 @@
       <span class="brand-label">Bean Sprout Realty Inc.</span>
       <h1 class="brand-title">Client Files</h1>
     </div>
-    <span class="pill">Admin</span>
+    <div style="display:flex; align-items:center; gap:14px;">
+      <span class="pill">Admin</span>
+      <button id="logout-btn" class="btn-icon" style="font-size:0.66rem; padding:8px 14px;">Log Out</button>
+    </div>
   </div>
 
   <div class="meta-bar">
-    <span class="meta-text">Manage documents visible to the client.</span>
+    <span class="meta-text">Manage documents visible to each client.</span>
   </div>
 
-  <div class="drop-zone" id="drop-zone">
-    <div class="drop-icon">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+  <!-- CLIENT MANAGEMENT -->
+  <div class="clients-panel" id="clients-panel">
+    <div class="clients-panel-toggle" id="clients-panel-toggle">
+      <div class="section-heading">Manage Clients <span class="count-badge" id="clients-count">0</span></div>
+      <span class="toggle-caret">▾</span>
     </div>
-    <div class="drop-title">Upload files for the client</div>
-    <div class="drop-sub">Click to browse, or drag files here · max 5MB each</div>
+    <div class="clients-panel-body">
+      <form class="add-client-form" id="add-client-form">
+        <input type="text" id="new-client-name" placeholder="Client name" required>
+        <input type="text" id="new-client-username" placeholder="Username" required>
+        <input type="text" id="new-client-password" placeholder="Password" required>
+        <button type="submit" class="btn-add-client" id="add-client-btn">Add Client</button>
+      </form>
+      <div class="form-error" id="add-client-error"></div>
+      <div id="clients-table-wrap">
+        <div class="clients-empty">Loading clients…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- UPLOAD -->
+  <div class="section-block">
+    <div class="client-picker">
+      <span class="picker-label">Assign this upload to</span>
+      <div class="picker-search-wrap">
+        <input type="text" class="picker-search" id="client-search" placeholder="Search clients by name or username…" autocomplete="off">
+        <div class="picker-dropdown" id="picker-dropdown"></div>
+      </div>
+      <div id="selected-client-wrap"></div>
+    </div>
+
+    <div class="drop-zone disabled" id="drop-zone">
+      <div class="drop-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      </div>
+      <div class="drop-title">Upload files for the client</div>
+      <div class="drop-sub" id="drop-sub-text">Select a client above first · max 5MB each</div>
+    </div>
   </div>
 
   <div id="file-list-wrap">
@@ -148,12 +291,28 @@
   const UPLOAD_URL = '/.netlify/functions/files-upload';
   const DELETE_URL = '/.netlify/functions/files-delete';
   const DOWNLOAD_URL = '/.netlify/functions/files-download';
+  const CLIENTS_LIST_URL = '/.netlify/functions/clients-list';
+  const CLIENTS_CREATE_URL = '/.netlify/functions/clients-create';
+  const CLIENTS_DELETE_URL = '/.netlify/functions/clients-delete';
 
   let files = [];
+  let clients = [];
+  let selectedClient = null;
 
   const fileListWrap = document.getElementById('file-list-wrap');
   const dropZone = document.getElementById('drop-zone');
+  const dropSubText = document.getElementById('drop-sub-text');
   const fileInput = document.getElementById('file-input');
+  const clientSearch = document.getElementById('client-search');
+  const pickerDropdown = document.getElementById('picker-dropdown');
+  const selectedClientWrap = document.getElementById('selected-client-wrap');
+  const clientsPanel = document.getElementById('clients-panel');
+  const clientsPanelToggle = document.getElementById('clients-panel-toggle');
+  const clientsTableWrap = document.getElementById('clients-table-wrap');
+  const clientsCount = document.getElementById('clients-count');
+  const addClientForm = document.getElementById('add-client-form');
+  const addClientError = document.getElementById('add-client-error');
+  const addClientBtn = document.getElementById('add-client-btn');
 
   function showToast(msg, isError = false) {
     const t = document.getElementById('toast');
@@ -178,9 +337,182 @@
     return ext || 'FILE';
   }
 
+  function redirectIfUnauthorized(res) {
+    if (res.status === 401) {
+      window.location.href = '/login';
+      return true;
+    }
+    return false;
+  }
+
+  /* ---------- CLIENTS ---------- */
+
+  async function loadClients() {
+    try {
+      const res = await fetch(CLIENTS_LIST_URL);
+      if (redirectIfUnauthorized(res)) return;
+      if (!res.ok) throw new Error('Failed to load clients');
+      clients = await res.json();
+      renderClientsTable();
+    } catch (e) {
+      clientsTableWrap.innerHTML = `<div class="clients-empty">Couldn't load clients.</div>`;
+    }
+  }
+
+  function renderClientsTable() {
+    clientsCount.textContent = clients.length;
+
+    if (clients.length === 0) {
+      clientsTableWrap.innerHTML = `<div class="clients-empty">No clients yet — add one above.</div>`;
+      return;
+    }
+
+    const rows = clients.map(c => `
+      <div class="client-row">
+        <div><span class="name">${c.name}</span><span class="username">@${c.username}</span></div>
+        <button class="remove-btn" data-id="${c.id}">Remove</button>
+      </div>
+    `).join('');
+
+    clientsTableWrap.innerHTML = `<div class="clients-table">${rows}</div>`;
+
+    clientsTableWrap.querySelectorAll('.remove-btn').forEach(btn => {
+      btn.addEventListener('click', () => removeClient(btn.dataset.id));
+    });
+  }
+
+  clientsPanelToggle.addEventListener('click', () => {
+    clientsPanel.classList.toggle('open');
+  });
+
+  addClientForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    addClientError.className = 'form-error';
+    addClientBtn.disabled = true;
+    addClientBtn.textContent = 'Adding…';
+
+    const name = document.getElementById('new-client-name').value.trim();
+    const username = document.getElementById('new-client-username').value.trim();
+    const password = document.getElementById('new-client-password').value;
+
+    try {
+      const res = await fetch(CLIENTS_CREATE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, username, password })
+      });
+      if (redirectIfUnauthorized(res)) return;
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Could not add client');
+
+      addClientForm.reset();
+      await loadClients();
+      showToast(`"${name}" added`);
+    } catch (e) {
+      addClientError.textContent = e.message;
+      addClientError.className = 'form-error show';
+    } finally {
+      addClientBtn.disabled = false;
+      addClientBtn.textContent = 'Add Client';
+    }
+  });
+
+  async function removeClient(id) {
+    const c = clients.find(x => x.id === id);
+    if (!confirm(`Remove ${c ? c.name : 'this client'}? Their existing files will remain but they will lose login access.`)) return;
+    try {
+      const res = await fetch(CLIENTS_DELETE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+      });
+      if (redirectIfUnauthorized(res)) return;
+      if (!res.ok) throw new Error('Failed to remove client');
+      if (selectedClient && selectedClient.id === id) clearSelectedClient();
+      await loadClients();
+      showToast(c ? `"${c.name}" removed` : 'Client removed');
+    } catch (e) {
+      showToast('Could not remove client', true);
+    }
+  }
+
+  /* ---------- CLIENT PICKER (search + select) ---------- */
+
+  function renderPickerOptions(query) {
+    const q = query.trim().toLowerCase();
+    const matches = clients.filter(c =>
+      c.name.toLowerCase().includes(q) || c.username.toLowerCase().includes(q)
+    );
+
+    if (matches.length === 0) {
+      pickerDropdown.innerHTML = `<div class="picker-empty">${clients.length === 0 ? 'No clients yet — add one above first.' : 'No matches.'}</div>`;
+    } else {
+      pickerDropdown.innerHTML = matches.map(c => `
+        <div class="picker-option" data-id="${c.id}">
+          <span class="opt-name">${c.name}</span><span class="opt-username">@${c.username}</span>
+        </div>
+      `).join('');
+      pickerDropdown.querySelectorAll('.picker-option').forEach(opt => {
+        opt.addEventListener('click', () => selectClient(opt.dataset.id));
+      });
+    }
+    pickerDropdown.classList.add('show');
+  }
+
+  clientSearch.addEventListener('focus', () => renderPickerOptions(clientSearch.value));
+  clientSearch.addEventListener('input', () => renderPickerOptions(clientSearch.value));
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.picker-search-wrap')) {
+      pickerDropdown.classList.remove('show');
+    }
+  });
+
+  function selectClient(id) {
+    const c = clients.find(x => x.id === id);
+    if (!c) return;
+    selectedClient = c;
+    pickerDropdown.classList.remove('show');
+    clientSearch.value = '';
+    renderSelectedClient();
+    updateDropZoneState();
+  }
+
+  function clearSelectedClient() {
+    selectedClient = null;
+    renderSelectedClient();
+    updateDropZoneState();
+  }
+
+  function renderSelectedClient() {
+    if (!selectedClient) {
+      selectedClientWrap.innerHTML = '';
+      return;
+    }
+    selectedClientWrap.innerHTML = `
+      <div class="selected-client-chip">
+        ${selectedClient.name} <span style="opacity:0.7;">@${selectedClient.username}</span>
+        <button id="clear-client-btn" title="Clear selection">✕</button>
+      </div>
+    `;
+    document.getElementById('clear-client-btn').addEventListener('click', clearSelectedClient);
+  }
+
+  function updateDropZoneState() {
+    if (selectedClient) {
+      dropZone.classList.remove('disabled');
+      dropSubText.textContent = 'Click to browse, or drag files here · max 5MB each';
+    } else {
+      dropZone.classList.add('disabled');
+      dropSubText.textContent = 'Select a client above first · max 5MB each';
+    }
+  }
+
+  /* ---------- FILES ---------- */
+
   async function loadFiles() {
     try {
       const res = await fetch(LIST_URL);
+      if (redirectIfUnauthorized(res)) return;
       if (!res.ok) throw new Error('Request failed');
       files = await res.json();
       render();
@@ -197,7 +529,7 @@
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
           </div>
           <div class="empty-title">No files yet</div>
-          <div class="empty-sub">Upload a document above to share it with the client.</div>
+          <div class="empty-sub">Select a client above, then upload a document to share it with them.</div>
         </div>`;
       return;
     }
@@ -207,7 +539,10 @@
         <div class="file-icon">${extTag(f.name)}</div>
         <div class="file-info">
           <div class="file-name">${f.name}</div>
-          <div class="file-sub">${formatBytes(f.size)} · Added ${formatDate(f.date)}</div>
+          <div class="file-sub">
+            ${formatBytes(f.size)} · Added ${formatDate(f.date)}
+            <span class="client-badge">${f.clientName || 'Unassigned'}</span>
+          </div>
         </div>
         <div class="file-actions">
           <a class="btn-icon" href="${DOWNLOAD_URL}?id=${f.id}" download="${f.name}">Download</a>
@@ -233,6 +568,10 @@
   }
 
   async function handleFiles(fileObjs) {
+    if (!selectedClient) {
+      showToast('Please select a client first', true);
+      return;
+    }
     const MAX = 5 * 1024 * 1024;
     for (const file of Array.from(fileObjs)) {
       if (file.size > MAX) {
@@ -244,13 +583,20 @@
         const res = await fetch(UPLOAD_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: file.name, size: file.size, type: file.type, dataBase64 })
+          body: JSON.stringify({
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            dataBase64,
+            clientId: selectedClient.id
+          })
         });
+        if (redirectIfUnauthorized(res)) return;
         if (!res.ok) {
           const err = await res.json().catch(() => ({}));
           throw new Error(err.error || 'Upload failed');
         }
-        showToast(`"${file.name}" uploaded`);
+        showToast(`"${file.name}" uploaded for ${selectedClient.name}`);
         await loadFiles();
       } catch (e) {
         showToast(`Couldn't upload "${file.name}" — ${e.message}`, true);
@@ -267,6 +613,7 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id })
       });
+      if (redirectIfUnauthorized(res)) return;
       if (!res.ok) throw new Error('Delete failed');
       showToast(f ? `"${f.name}" removed` : 'File removed');
       await loadFiles();
@@ -276,20 +623,54 @@
     }
   }
 
-  dropZone.addEventListener('click', () => fileInput.click());
-  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+  dropZone.addEventListener('click', () => { if (selectedClient) fileInput.click(); });
+  dropZone.addEventListener('dragover', e => {
+    e.preventDefault();
+    if (selectedClient) dropZone.classList.add('drag-over');
+  });
   dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
   dropZone.addEventListener('drop', e => {
     e.preventDefault();
     dropZone.classList.remove('drag-over');
-    handleFiles(e.dataTransfer.files);
+    if (selectedClient) handleFiles(e.dataTransfer.files);
   });
   fileInput.addEventListener('change', e => {
     handleFiles(e.target.files);
     fileInput.value = '';
   });
 
-  loadFiles();
+  /* ---------- AUTH ---------- */
+
+  async function checkAuth() {
+    try {
+      const res = await fetch('/.netlify/functions/auth-check?role=admin');
+      const data = await res.json();
+      if (!data.authenticated) {
+        window.location.href = '/login';
+        return false;
+      }
+      return true;
+    } catch (e) {
+      window.location.href = '/login';
+      return false;
+    }
+  }
+
+  document.getElementById('logout-btn').addEventListener('click', async () => {
+    try {
+      await fetch('/.netlify/functions/auth-logout?role=admin', { method: 'POST' });
+    } catch (e) {}
+    window.location.href = '/login';
+  });
+
+  (async () => {
+    const ok = await checkAuth();
+    if (ok) {
+      updateDropZoneState();
+      await loadClients();
+      await loadFiles();
+    }
+  })();
 </script>
 </body>
 </html>

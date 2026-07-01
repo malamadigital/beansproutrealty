@@ -17,7 +17,13 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: var(--font-body); background: var(--ash); color: var(--text); min-height: 100vh; -webkit-font-smoothing: antialiased; }
   .wrap { max-width: 880px; margin: 0 auto; padding: 56px 6% 80px; }
-  .header { margin-bottom: 8px; padding-bottom: 28px; border-bottom: 1px solid var(--ash-dark); }
+  .header { margin-bottom: 8px; padding-bottom: 28px; border-bottom: 1px solid var(--ash-dark); display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 20px; }
+  .btn-logout {
+    font-family: var(--font-body); font-size: 0.66rem; font-weight: 500; letter-spacing: 0.06em;
+    text-transform: uppercase; padding: 8px 14px; border-radius: 2px; border: 1px solid var(--navy);
+    color: var(--navy); background: transparent; cursor: pointer; transition: background .2s, color .2s;
+  }
+  .btn-logout:hover { background: var(--navy); color: var(--white); }
   .brand-label { font-size: 0.68rem; font-weight: 500; letter-spacing: 0.28em; text-transform: uppercase; color: var(--steel); margin-bottom: 10px; display: block; }
   .brand-title { font-family: var(--font-display); font-size: clamp(1.8rem, 3.5vw, 2.6rem); font-weight: 400; color: var(--navy); line-height: 1.1; }
   .meta-bar { margin: 28px 0 32px; }
@@ -61,8 +67,11 @@
 
 <div class="wrap">
   <div class="header">
-    <span class="brand-label">Bean Sprout Realty Inc.</span>
-    <h1 class="brand-title">Client Files</h1>
+    <div>
+      <span class="brand-label">Bean Sprout Realty Inc.</span>
+      <h1 class="brand-title">Client Files</h1>
+    </div>
+    <button id="logout-btn" class="btn-logout">Log Out</button>
   </div>
 
   <div class="meta-bar">
@@ -96,9 +105,35 @@
     return ext || 'FILE';
   }
 
+  async function checkAuth() {
+    try {
+      const res = await fetch('/.netlify/functions/auth-check?role=client');
+      const data = await res.json();
+      if (!data.authenticated) {
+        window.location.href = '/client-login';
+        return false;
+      }
+      return true;
+    } catch (e) {
+      window.location.href = '/client-login';
+      return false;
+    }
+  }
+
+  document.getElementById('logout-btn').addEventListener('click', async () => {
+    try {
+      await fetch('/.netlify/functions/auth-logout?role=client', { method: 'POST' });
+    } catch (e) {}
+    window.location.href = '/client-login';
+  });
+
   async function loadFiles() {
     try {
       const res = await fetch(LIST_URL);
+      if (res.status === 401) {
+        window.location.href = '/client-login';
+        return;
+      }
       if (!res.ok) throw new Error('Request failed');
       const files = await res.json();
       render(files);
@@ -106,6 +141,7 @@
       fileListWrap.innerHTML = `<div class="error-row">Couldn't load files right now. Please check back shortly.</div>`;
     }
   }
+
 
   function render(files) {
     if (!files || files.length === 0) {
@@ -136,7 +172,10 @@
     fileListWrap.innerHTML = `<div class="file-list">${rows}</div>`;
   }
 
-  loadFiles();
+  (async () => {
+    const ok = await checkAuth();
+    if (ok) loadFiles();
+  })();
 </script>
 </body>
 </html>

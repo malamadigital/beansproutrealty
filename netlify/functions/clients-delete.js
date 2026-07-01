@@ -1,7 +1,7 @@
 import { getStore } from "@netlify/blobs";
 import { getAuthContext } from "./utils/auth.js";
 
-const STORE_NAME = "client-files";
+const STORE_NAME = "clients-directory";
 
 export default async (req) => {
   if (req.method !== "POST" && req.method !== "DELETE") {
@@ -10,7 +10,7 @@ export default async (req) => {
 
   const ctx = getAuthContext(req);
   if (!ctx || ctx.role !== "admin") {
-    return new Response(JSON.stringify({ error: "Unauthorized — please log in" }), {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
       headers: { "Content-Type": "application/json" }
     });
@@ -30,17 +30,15 @@ export default async (req) => {
   }
 
   const store = getStore({ name: STORE_NAME, consistency: "strong" });
-  await store.delete(id);
-
-  let index = [];
+  let clients = [];
   try {
-    index = (await store.get("index", { type: "json" })) || [];
+    clients = (await store.get("index", { type: "json" })) || [];
   } catch (e) {
-    index = [];
+    clients = [];
   }
 
-  index = index.filter((f) => f.id !== id);
-  await store.setJSON("index", index);
+  clients = clients.filter((c) => c.id !== id);
+  await store.setJSON("index", clients);
 
   return new Response(JSON.stringify({ ok: true }), {
     headers: { "Content-Type": "application/json" }
